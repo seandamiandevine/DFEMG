@@ -40,9 +40,9 @@ def runTask(id, sex, age, _thisDir):
     choiceKeys   = ['left', 'right']              # keys to make choices
     ITI          = 2                              # ITI time in sec. 
     fbTime       = 1.5                            # feedback time in sec. 
-    stimDir      = 'stim/'                        # where stimuli are located 
+    stimDir      = 'stim/'                        # directory where stimuli are located 
     maxPayout    = 5                              # amount all subjects earn at end, regardless of points
-    hapFreq      = 5
+    hapFreq      = 5                              # number of trials between happiness scales
     
     # initialize trial components
     trialClock = core.Clock()
@@ -129,7 +129,7 @@ def runTask(id, sex, age, _thisDir):
         core.wait(fbTime)
         win.flip()
 
-        # 3. Happiness slider 
+        # 4. Happiness slider 
         if t>0 and t%hapFreq==0:
             while hapSlider.noResponse:
                 hapPrompt.draw()
@@ -142,7 +142,7 @@ def runTask(id, sex, age, _thisDir):
             happiness   = 'NA'
             happinessRT = 'NA'
 
-        # 4. ITI
+        # 5. ITI
         ITITime = trialClock.getTime()
         fix.draw()
         win.flip()
