@@ -1,9 +1,8 @@
-from psychopy import visual, core, event, monitors, sound
-import pandas as pd
-from random import shuffle
-from numpy.random import choice
-import os
+from   psychopy     import visual, core, event, monitors, sound
+from   numpy.random import choice
+import pandas   as pd
 import datetime as dt
+import os
 import pyfiglet
 
 from fx.addOutput import addOutput, initCSV
@@ -167,8 +166,5 @@ id  = input('Please enter the SUBJECT ID NUMBER: ')
 age = input("Please enter the subject's AGE: ")
 sex = input("Please enter the subject's SEX: ")
 print('Good luck!')
-# sex='M'
-# age='25'
-# id = '999'
 
 runTask(id, str(sex), str(age), os.getcwd())
