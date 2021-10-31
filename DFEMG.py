@@ -23,7 +23,7 @@ def runTask(id, sex, age, _thisDir):
 
     # Window setup
     win = visual.Window(
-        size=[1920//1.5, 1080//1.5], fullscr=False, screen=0,
+        size=[1920//1.5, 1080//1.5], fullscr=True, screen=0,
         allowGUI=True, allowStencil=True,
         monitor='testMonitor', color=[-1,-1,-1], colorSpace='rgb',
         blendMode='avg', useFBO=True,
