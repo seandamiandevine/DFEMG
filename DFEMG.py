@@ -11,20 +11,20 @@ def runTask(id, sex, age, _thisDir):
     """
     Risky decision-making task for Alexa's project
     fEMG triggers to be added for BIOPAC machine
-    
-    
-    For question, contact Sean. 
+
+
+    For question, contact Sean.
     seandamiandevine@gmail.com
     """
     # Initialize datafile
     filename = _thisDir + os.sep + 'data' + os.sep + 'DFEMG_' + str(id)+'_'+str(dt.datetime.now()).replace(':','_')+'.csv'
-    initCSV(filename, ['id', 'age', 'sex', 'trial', 'certainSide', 'riskySide', 'certainRew', 'riskyRew', 'probability', 
+    initCSV(filename, ['id', 'age', 'sex', 'trial', 'certainSide', 'riskySide', 'certainRew', 'riskyRew', 'probability',
      'key_press', 'choice', 'RT', 'outcome', 'feedback', 'score', 'happiness', 'happinessRT', 'cardTime', 'choiceTime', 'fbTime', 'ITITime'])
 
     # Window setup
     win = visual.Window(
-        size=[1920/2, 1080/2], fullscr=True, screen=0,
-        allowGUI=False, allowStencil=False,
+        size=[1920//1.5, 1080//1.5], fullscr=False, screen=0,
+        allowGUI=True, allowStencil=True,
         monitor='testMonitor', color=[-1,-1,-1], colorSpace='rgb',
         blendMode='avg', useFBO=True,
         units='cm')
@@ -37,12 +37,12 @@ def runTask(id, sex, age, _thisDir):
     nTrials      = len(trialdf)                   # number of trials
     loseRisk     = 0                              # amount gained (or lost) when risky option is lost
     choiceKeys   = ['left', 'right']              # keys to make choices
-    ITI          = 2                              # ITI time in sec. 
-    fbTime       = 1.5                            # feedback time in sec. 
-    stimDir      = 'stim/'                        # directory where stimuli are located 
+    ITI          = 2                              # ITI time in sec.
+    fbTime       = 1.5                            # feedback time in sec.
+    stimDir      = 'stim/'                        # directory where stimuli are located
     maxPayout    = 5                              # amount all subjects earn at end, regardless of points
     hapFreq      = 5                              # number of trials between happiness scales
-    
+
     # initialize trial components
     trialClock = core.Clock()
     certainRew = visual.TextStim(win, text="", height=3*fontH, color=valCol)
@@ -74,7 +74,7 @@ def runTask(id, sex, age, _thisDir):
         riskySide   = 'R' if certainSide=='L' else 'L'
 
         startTime = trialClock.getTime()
-        
+
         # 1. Display cards
         cardTime        = trialClock.getTime()
         certainRew.text = '$'+str(thisCertain)
@@ -86,7 +86,7 @@ def runTask(id, sex, age, _thisDir):
             certainRew.pos = [cardR.pos[0], cardR.pos[1]+8]
             riskyRew.pos   = [cardL.pos[0], cardL.pos[1]-8]
             riskyLoss.pos  = [cardL.pos[0], cardL.pos[1]+8]
-        else: 
+        else:
             cardR.image    = '{}{}_{}.png'.format(stimDir, int(thisProb*100), int(round((1-thisProb)*100)))
             cardL.image    = '{}100.png'.format(stimDir)
             certainRew.pos = [cardL.pos[0], cardL.pos[1]+8]
@@ -99,19 +99,21 @@ def runTask(id, sex, age, _thisDir):
         riskyLoss.draw()
         scoreBoard.draw()
         win.flip()
-        key_press   = event.waitKeys(keyList = choiceKeys)
+        key_press   = event.waitKeys(keyList = choiceKeys+['escape'])
         choiceTime  = trialClock.getTime()
         RT          = choiceTime - cardTime
         response    = key_press[0]
-        if response == choiceKeys[0] and certainSide=='L':
+        if response == 'escape':
+            core.quit()
+        elif response == choiceKeys[0] and certainSide=='L':
             choiceRC = 'certain'
             reward   = thisCertain
         elif response == choiceKeys[1] and certainSide=='R':
             choiceRC = 'certain'
             reward   = thisCertain
-        else: 
+        else:
             choiceRC = 'risky'
-            reward   = choice([thisRisky,loseRisk], 1, [thisProb, 1-thisProb])[0]
+            reward   = choice([thisRisky,loseRisk], 1, p=[thisProb, 1-thisProb])[0]
         score+=reward
 
         # 3. Feedback
@@ -120,7 +122,7 @@ def runTask(id, sex, age, _thisDir):
         if reward==0:
             feedback.color='red'
             loseSound.play()
-        else: 
+        else:
             feedback.color='green'
             winSound.play()
         feedback.draw()
@@ -128,7 +130,7 @@ def runTask(id, sex, age, _thisDir):
         core.wait(fbTime)
         win.flip()
 
-        # 4. Happiness slider 
+        # 4. Happiness slider
         if t>0 and t%hapFreq==0:
             while hapSlider.noResponse:
                 hapPrompt.draw()
@@ -137,7 +139,7 @@ def runTask(id, sex, age, _thisDir):
             happiness   = hapSlider.getRating()
             happinessRT = hapSlider.getRT()
             hapSlider.reset()
-        else: 
+        else:
             happiness   = 'NA'
             happinessRT = 'NA'
 
@@ -149,10 +151,10 @@ def runTask(id, sex, age, _thisDir):
         win.flip()
 
         # Save output
-        out = [id, age, sex, t, certainSide, riskySide, thisCertain, thisRisky, thisProb, 
+        out = [id, age, sex, t, certainSide, riskySide, thisCertain, thisRisky, thisProb,
             response, choiceRC, RT, reward, feedback.text, score, happiness, happinessRT, cardTime, choiceTime, feedbackTime, ITITime]
         addOutput(filename, out)
-   
+
     # Show end screen
     endScreen.text='Thank you for completing our study!\n\nYou earned {} points, which translates to ${}.\n\nSee the experimenter for further details.'.format(round(score,2), maxPayout)
     endScreen.draw()
